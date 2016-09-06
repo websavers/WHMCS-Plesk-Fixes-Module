@@ -8,24 +8,69 @@ if (!defined("WHMCS"))
  * Register Hooks
  */
 
-/* Plesk Password complexity fix */
-add_hook("PreModuleCreate",1,"ws_plesk_pre_module_create");
+add_hook("PreModuleCreate",1,"ws_plesk_password_complexity");
+
+/* Has conditionals to encode/decode HTML entities */
+add_hook("PreModuleCreate",2,"ws_plesk_encode_decode");
+add_hook("AfterModuleCreate",2,"ws_plesk_encode_decode");
 
 /**
  * WHMCS only generates 8 character passwords which aren't complex enough
  * for the "Very Strong" security function in Plesk 12+
  * This hook modifies the password prior to provisioning to make it more secure
  **/
-function ws_plesk_pre_module_create($vars){
 
-	if ($vars['params']['moduletype'] == 'plesk'){
+function ws_plesk_password_complexity($vars){
 
+	if (
+		$vars['params']['moduletype'] == 'plesk' &&
+		strlen($vars['params']['password']) < 9
+	){
+
+		//Change password saved in WHMCS for product
 		$command = "updateclientproduct";
 		$adminuser = $vars['adminuser'];
 		$values["serviceid"] = $vars['params']['serviceid'];
 		$values["servicepassword"] = randomPassword(20);
 
 		$results = localAPI($command,$values,$adminuser);
+
+	}
+
+}
+
+function ws_plesk_encode_decode($vars){
+
+	if ( $vars['params']['moduletype'] == 'plesk' ){
+
+		$companyname = $vars['params']['clientsdetails']['companyname'];
+
+		// Set up for localAPI call
+		$command = "updateclient";
+		$adminuser = $vars['adminuser'];
+		$values["clientid"] = $vars['params']['clientsdetails']['id'];
+
+		if ( strstr($companyname, ' and ') ){ //after module, change back
+
+			$values["companyname"] = str_replace(' and ', ' & ', $companyname);
+
+			// Change Client Data
+			$results = localAPI($command,$values,$adminuser);
+
+		}
+		elseif ( strstr($companyname, ' & ') || strstr($companyname, ' &amp; ') ){ //before module, escape HTML data
+
+			$values["companyname"] = str_replace(' & ', ' and ', $companyname);
+			$values["companyname"] = str_replace(' &amp; ', ' and ', $values["companyname"]);
+			//logActivity("NAME AFTER CHANGE: " . $values["companyname"]); //DEBUG
+
+			// Change Client Data
+			$results = localAPI($command,$values,$adminuser);
+
+		}
+		else{
+			//No ampersands found to deal with
+		}
 
 	}
 
