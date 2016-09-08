@@ -3,6 +3,8 @@
 if (!defined("WHMCS"))
 	die("This file cannot be accessed directly");
 
+define("WHMCS_DEFAULT_PASSWORD_LENGTH", 10);
+define("NEW_PASSWORD_LENGTH", 20)
 
 /**
  * Register Hooks
@@ -24,14 +26,14 @@ function ws_plesk_password_complexity($vars){
 
 	if (
 		$vars['params']['moduletype'] == 'plesk' &&
-		strlen($vars['params']['password']) < 9
+		strlen($vars['params']['password']) <= WHMCS_DEFAULT_PASSWORD_LENGTH
 	){
 
 		//Change password saved in WHMCS for product
 		$command = "updateclientproduct";
 		$adminuser = $vars['adminuser'];
 		$values["serviceid"] = $vars['params']['serviceid'];
-		$values["servicepassword"] = randomPassword(20);
+		$values["servicepassword"] = randomPassword(NEW_PASSWORD_LENGTH);
 
 		$results = localAPI($command,$values,$adminuser);
 
