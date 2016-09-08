@@ -4,7 +4,7 @@ if (!defined("WHMCS"))
 	die("This file cannot be accessed directly");
 
 define("WHMCS_DEFAULT_PASSWORD_LENGTH", 10);
-define("NEW_PASSWORD_LENGTH", 20)
+define("NEW_PASSWORD_LENGTH", 20);
 
 /**
  * Register Hooks
