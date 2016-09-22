@@ -90,14 +90,22 @@ function ws_plesk_encode_decode($vars){
  */
 
 function randomPassword($size = 8) {
+
     $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*?_~';
+		$symbols = '!@#$%^&*?_~';
+
     $pass = array(); //remember to declare $pass as an array
     $alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
     for ($i = 0; $i < $size; $i++) {
         $n = rand(0, $alphaLength);
         $pass[] = $alphabet[$n];
     }
+		if ( empty( preg_grep('/[!@#\$%\^&\*\?_~]/', $pass) ) ){ // no symbols. Add 2
+				$pass[rand(0, $alphaLength)] = $symbols[rand(0, strlen($symbols) - 1)];
+				$pass[rand(0, $alphaLength)] = $symbols[rand(0, strlen($symbols) - 1)];
+		}
     return implode($pass); //turn the array into a string
+
 }
 
 ?>
