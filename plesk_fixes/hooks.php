@@ -100,7 +100,7 @@ function randomPassword($size = 8) {
         $n = rand(0, $alphaLength);
         $pass[] = $alphabet[$n];
     }
-		if ( empty( preg_grep('/[!@#\$%\^&\*\?_~]/', $pass) ) ){ // no symbols. Add 2
+		if ( empty( preg_grep('/[!@#\$%\^&\*\?_~]/', $pass) ) ){ // If no symbols. Add 2
 				$pass[rand(0, $alphaLength)] = $symbols[rand(0, strlen($symbols) - 1)];
 				$pass[rand(0, $alphaLength)] = $symbols[rand(0, strlen($symbols) - 1)];
 		}
