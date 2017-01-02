@@ -3,6 +3,7 @@
 if (!defined("WHMCS"))
 	die("This file cannot be accessed directly");
 
+define("WHMCS_ADMIN_USER", 'admin'); //Set me accordingly
 define("WHMCS_DEFAULT_PASSWORD_LENGTH", 10);
 define("NEW_PASSWORD_LENGTH", 20);
 
@@ -23,15 +24,14 @@ add_hook("AfterModuleCreate",2,"ws_plesk_encode_decode");
  **/
 
 function ws_plesk_password_complexity($vars){
+	
+	//logActivity( "DEBUG: Running custom hook function 'ws_plesk_password_complexity'" ); //DEBUG
 
-	if (
-		$vars['params']['moduletype'] == 'plesk' &&
-		strlen($vars['params']['password']) <= WHMCS_DEFAULT_PASSWORD_LENGTH
-	){
+	if ( $vars['params']['moduletype'] == 'plesk' && strlen($vars['params']['password']) <= WHMCS_DEFAULT_PASSWORD_LENGTH ){
 
 		//Change password saved in WHMCS for product
 		$command = "updateclientproduct";
-		$adminuser = $vars['adminuser'];
+		$adminuser = ($vars['adminuser'])? $vars['adminuser'] : WHMCS_ADMIN_USER;
 		$values["serviceid"] = $vars['params']['serviceid'];
 		$values["servicepassword"] = randomPassword(NEW_PASSWORD_LENGTH);
 
@@ -71,7 +71,7 @@ function ws_plesk_encode_decode($vars){
 
 		}
 		else{
-			//No ampersands found to deal with
+			//No & or 'and' found. Do nothing.
 		}
 
 	}
