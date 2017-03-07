@@ -1,21 +1,11 @@
 <?php
 
+use Illuminate\Database\Capsule\Manager as Capsule;
+
 if (!defined("WHMCS"))
 	die("This file cannot be accessed directly");
 
-define("WHMCS_ADMIN_USER", 'admin'); //Set me accordingly
-define("WHMCS_DEFAULT_PASSWORD_LENGTH", 10);
 define("NEW_PASSWORD_LENGTH", 20);
-
-/**
- * Register Hooks
- */
-
-add_hook("PreModuleCreate",1,"ws_plesk_password_complexity");
-
-/* Has conditionals to encode/decode HTML entities */
-add_hook("PreModuleCreate",2,"ws_plesk_encode_decode");
-add_hook("AfterModuleCreate",2,"ws_plesk_encode_decode");
 
 /**
  * WHMCS only generates 8 character passwords which aren't complex enough
@@ -23,15 +13,13 @@ add_hook("AfterModuleCreate",2,"ws_plesk_encode_decode");
  * This hook modifies the password prior to provisioning to make it more secure
  **/
 
-function ws_plesk_password_complexity($vars){
+add_hook("PreModuleCreate", 2, function($vars){
 	
-	//logActivity( "DEBUG: Running custom hook function 'ws_plesk_password_complexity'" ); //DEBUG
-
-	if ( $vars['params']['moduletype'] == 'plesk' && strlen($vars['params']['password']) <= WHMCS_DEFAULT_PASSWORD_LENGTH ){
+	if ( $vars['params']['moduletype'] == 'plesk' && strlen($vars['params']['password']) <= NEW_PASSWORD_LENGTH ){
 
 		//Change password saved in WHMCS for product
 		$command = "updateclientproduct";
-		$adminuser = ($vars['adminuser'])? $vars['adminuser'] : WHMCS_ADMIN_USER;
+		$adminuser = getSettings('plesk_fixes', 'adminuser');
 		$values["serviceid"] = $vars['params']['serviceid'];
 		$values["servicepassword"] = randomPassword(NEW_PASSWORD_LENGTH);
 
@@ -39,31 +27,37 @@ function ws_plesk_password_complexity($vars){
 
 	}
 
-}
+});
+
+/* Has conditionals to encode/decode HTML entities */
+
+add_hook("PreModuleCreate", 1, "ws_plesk_encode_decode");
+add_hook("AfterModuleCreate", 1, "ws_plesk_encode_decode");
 
 function ws_plesk_encode_decode($vars){
-
-	if ( $vars['params']['moduletype'] == 'plesk' ){
+	
+	if ( $vars['params']['moduletype'] === 'plesk' ){
 
 		$companyname = $vars['params']['clientsdetails']['companyname'];
 
 		// Set up for localAPI call
 		$command = "updateclient";
-		$adminuser = $vars['adminuser'];
+		$adminuser = getSettings('plesk_fixes', 'adminuser');
+		//logActivity("Admin User: $adminuser");
 		$values["clientid"] = $vars['params']['clientsdetails']['id'];
 
-		if ( strstr($companyname, ' and ') ){ //after module, change back
+		if ( strstr($companyname, 'and') ){ //after module, change back
 
-			$values["companyname"] = str_replace(' and ', ' & ', $companyname);
+			$values["companyname"] = str_replace('and', '&', $companyname);
 
 			// Change Client Data
 			$results = localAPI($command,$values,$adminuser);
 
 		}
-		elseif ( strstr($companyname, ' & ') || strstr($companyname, ' &amp; ') ){ //before module, escape HTML data
+		else if ( strstr($companyname, '&') || strstr($companyname, '&amp;') ){ //before module, escape HTML data
 
-			$values["companyname"] = str_replace(' & ', ' and ', $companyname);
-			$values["companyname"] = str_replace(' &amp; ', ' and ', $values["companyname"]);
+			$values["companyname"] = str_replace('&amp;', 'and', $companyname);
+			$values["companyname"] = str_replace('&', 'and', $values["companyname"]);
 			//logActivity("NAME AFTER CHANGE: " . $values["companyname"]); //DEBUG
 
 			// Change Client Data
@@ -81,6 +75,25 @@ function ws_plesk_encode_decode($vars){
 /********************
  * Helper Functions *
  ********************/
+ 
+/**
+ * Returns:
+ * - Associative array containing settings if no settingname provided
+ * - value of type stored in DB if settingname is provided 
+ */
+function getSettings($modulename, $settingname = null){
+	
+	if ($settingname === null){
+		return (array) Capsule::table('tbladdonmodules')->where('module', $modulename)->get();
+	}
+	else{
+		return Capsule::table('tbladdonmodules')->where( array(
+				'module' => $modulename, 
+				'setting' => $settingname,
+			) )->value('value');
+	}
+		
+}
 
 /**
  * Pseudorandom password generator
