@@ -104,8 +104,8 @@ function getSettings($modulename, $settingname = null){
 
 function randomPassword($size = 8) {
 
-    $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*?_~';
-		$symbols = '!@#$%^&*?_~';
+    $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^*?_~';
+		$symbols = '!@#$%^*?_~';
 
     $pass = array(); //remember to declare $pass as an array
     $alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
