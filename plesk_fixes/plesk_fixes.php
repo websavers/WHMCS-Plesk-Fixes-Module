@@ -22,13 +22,6 @@ function plesk_fixes_config() {
 	    "author" => "Websavers Inc",
 	    "language" => "english",
 	    "fields" => array(
-				"adminuser" => array (
-						"FriendlyName" => "Admin User",
-						"Type" => "text",
-						"Size" => "25",
-						"Description" => "Supply an admin username that has full privileges",
-						"Default" => "admin",
-					),
     	),
 		);
     return $configarray;
