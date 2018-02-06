@@ -19,11 +19,10 @@ add_hook("PreModuleCreate", 2, function($vars){
 
 		//Change password saved in WHMCS for product
 		$command = "updateclientproduct";
-		$adminuser = getSettings('plesk_fixes', 'adminuser');
 		$values["serviceid"] = $vars['params']['serviceid'];
 		$values["servicepassword"] = randomPassword(NEW_PASSWORD_LENGTH);
 
-		$results = localAPI($command,$values,$adminuser);
+		$results = localAPI($command,$values);
 
 	}
 
@@ -42,8 +41,6 @@ function ws_plesk_encode_decode($vars){
 
 		// Set up for localAPI call
 		$command = "updateclient";
-		$adminuser = getSettings('plesk_fixes', 'adminuser');
-		//logActivity("Admin User: $adminuser");
 		$values["clientid"] = $vars['params']['clientsdetails']['id'];
 
 		if ( strstr($companyname, 'and') ){ //after module, change back
@@ -51,7 +48,7 @@ function ws_plesk_encode_decode($vars){
 			$values["companyname"] = str_replace('and', '&', $companyname);
 
 			// Change Client Data
-			$results = localAPI($command,$values,$adminuser);
+			$results = localAPI($command,$values);
 
 		}
 		else if ( strstr($companyname, '&') || strstr($companyname, '&amp;') ){ //before module, escape HTML data
@@ -61,7 +58,7 @@ function ws_plesk_encode_decode($vars){
 			//logActivity("NAME AFTER CHANGE: " . $values["companyname"]); //DEBUG
 
 			// Change Client Data
-			$results = localAPI($command,$values,$adminuser);
+			$results = localAPI($command,$values);
 
 		}
 		else{
@@ -75,25 +72,6 @@ function ws_plesk_encode_decode($vars){
 /********************
  * Helper Functions *
  ********************/
- 
-/**
- * Returns:
- * - Associative array containing settings if no settingname provided
- * - value of type stored in DB if settingname is provided 
- */
-function getSettings($modulename, $settingname = null){
-	
-	if ($settingname === null){
-		return (array) Capsule::table('tbladdonmodules')->where('module', $modulename)->get();
-	}
-	else{
-		return Capsule::table('tbladdonmodules')->where( array(
-				'module' => $modulename, 
-				'setting' => $settingname,
-			) )->value('value');
-	}
-		
-}
 
 /**
  * Pseudorandom password generator
