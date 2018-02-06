@@ -28,51 +28,6 @@ add_hook("PreModuleCreate", 2, function($vars){
 
 });
 
-/* Has conditionals to encode/decode HTML entities */
-
-add_hook("PreModuleCreate", 1, "ws_plesk_encode_decode");
-add_hook("AfterModuleCreate", 1, "ws_plesk_encode_decode");
-
-function ws_plesk_encode_decode($vars){
-	
-	if ( $vars['params']['moduletype'] === 'plesk' ){
-
-		$companyname = $vars['params']['clientsdetails']['companyname'];
-
-		// Set up for localAPI call
-		$command = "updateclient";
-		$values["clientid"] = $vars['params']['clientsdetails']['id'];
-
-		if ( strstr($companyname, 'and') ){ //after module, change back
-
-			$values["companyname"] = str_replace('and', '&', $companyname);
-
-			// Change Client Data
-			$results = localAPI($command,$values);
-
-		}
-		else if ( strstr($companyname, '&') || strstr($companyname, '&amp;') ){ //before module, escape HTML data
-
-			$values["companyname"] = str_replace('&amp;', 'and', $companyname);
-			$values["companyname"] = str_replace('&', 'and', $values["companyname"]);
-			//logActivity("NAME AFTER CHANGE: " . $values["companyname"]); //DEBUG
-
-			// Change Client Data
-			$results = localAPI($command,$values);
-
-		}
-		else{
-			//No & or 'and' found. Do nothing.
-		}
-
-	}
-
-}
-
-/********************
- * Helper Functions *
- ********************/
-
 /**
  * Pseudorandom password generator
  * Limitations:
