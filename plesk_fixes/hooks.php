@@ -20,7 +20,7 @@ add_hook("PreModuleCreate", 2, function($vars){
 		//Change password saved in WHMCS for product
 		$command = "updateclientproduct";
 		$values["serviceid"] = $vars['params']['serviceid'];
-		$values["servicepassword"] = randomPassword(NEW_PASSWORD_LENGTH);
+		$values["servicepassword"] = pleskfixes_randomPassword(NEW_PASSWORD_LENGTH);
 
 		$results = localAPI($command,$values);
 
@@ -80,7 +80,7 @@ function ws_plesk_encode_decode($vars){
  *   if/when you switch to using PHP 7 (probably after WHMCS v7)
  */
 
-function randomPassword($size = 8) {
+function pleskfixes_randomPassword($size = 8) {
 
     $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^*?_~';
 		$symbols = '!@#$%^*?_~';
