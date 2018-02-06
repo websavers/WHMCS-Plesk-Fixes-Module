@@ -1,5 +1,5 @@
 # WHMCS-Plesk-Fixes-Module
-This module contains a set of fixes for better Plesk compatibility for the built in WHMCS Plesk provisioning module.
+This module contains a fix for better Plesk compatibility for the built in WHMCS Plesk provisioning module.
 
 Fix #1:
 
@@ -10,6 +10,8 @@ WHMCS Error: Error: Error code: 1019. Error message: Your password is not comple
 Forum Thread: https://forum.whmcs.com/showthread.php?95734-Plesk-Product-Subscription-Password-Security-Error-code-1019-when-plesk-password-reqs-set-to-high
 
 Fix #2:
+
+[THIS IS NO LONGER IN THE CODE AS IT HAS BEEN FIXED IN THE WHMCS PLESK GITHUB MODULE CODE]
 
 An '&' found in client profile data when sent to Plesk for provisioning will prevent the account from creating successfully with the following error. We brought this up to the WHMCS dev team in their forum 2 years ago and yet it hasn't been fixed. So we fixed it.
 
