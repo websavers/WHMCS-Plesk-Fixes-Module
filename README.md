@@ -1,6 +1,8 @@
 # WHMCS-Plesk-Fixes-Module
 This module contains a fix for better Plesk compatibility for the built in WHMCS Plesk provisioning module.
 
+Please note: This module is no longer necessary as WHMCS now has support for stronger passwords for provisioning and the Plesk devs have repaired the ampersands processing issue in the module found on GitHub. I will not be making further changes to this code; if you feel you need it, feel free to use it and modify as you wish.
+
 Fix #1:
 
 If you use the built in WHMCS Plesk provisioning module and set your security policy to "Very Strong" within Plesk, you'll find that automatic provisioning no longer works because WHMCS refuses to generate secure enough passwords. When queried about fixing this, WHMCS responded that since we are choosing to use a security policy it's not up to them to fix this. They recommend that we downgrade our security policty. This seemed absurd to us, so rather than waiting for them to fix it, we built this module to do the job.
