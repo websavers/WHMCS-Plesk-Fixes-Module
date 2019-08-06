@@ -18,7 +18,7 @@ Most important code for this addon is found in the hooks.php file.
 function plesk_fixes_config() {
     $configarray = array(
 	    "name" => "Plesk Fixes",
-	    "version" => "1.2",
+	    "version" => "2.0",
 	    "author" => "Websavers Inc",
 	    "language" => "english",
 	    "fields" => array(
